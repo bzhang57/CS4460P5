@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <title>CS4460 P5</title>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="main.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>College Admission and Demographic Statistics Visualization</h1>
+    <label>Show relationship between:</label>
+    <div>
+    <select id="xValue">
+        <option value="control">Control</option>
+        <option value="Region">Region</option>
+        <option value="Locale">Locale</option>
+    </select>
+    <label>and</label>
+    <select id="yValue">
+        <option value="admissionRate">Admission Rate</option>
+        <option value="actMedian">ACT Median</option>
+        <option value="satAverage">SAT Average</option>
+        <option value="undergradPopulation">Undergrad Population</option>
+    </select>
+    </div>
+    <div id="graph"></div>
+</body>
+</html>
