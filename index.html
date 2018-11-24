@@ -11,19 +11,37 @@
     <h1>College Admission and Demographic Statistics Visualization</h1>
     <label>Show relationship between:</label>
     <div>
-    <select id="xValue">
-        <option value="control">Control</option>
-        <option value="Region">Region</option>
-        <option value="Locale">Locale</option>
-    </select>
-    <label>and</label>
-    <select id="yValue">
-        <option value="admissionRate">Admission Rate</option>
-        <option value="actMedian">ACT Median</option>
-        <option value="satAverage">SAT Average</option>
-        <option value="undergradPopulation">Undergrad Population</option>
-    </select>
+        <div style="float: left; width: 50%;">
+        <select id="yValue1">
+            <option value="Control">Control</option>
+            <option value="Region">Region</option>
+            <option value="Locale">Locale</option>
+        </select>
+        <label>and</label>
+        <select id="xValue1">
+            <option value="Admission Rate">Admission Rate</option>
+            <option value="ACT Median">ACT Median</option>
+            <option value="SAT Average">SAT Average</option>
+            <option value="Undergrad Population">Undergrad Population</option>
+        </select>
+        </div>
+        <div style="float: right; width: 50%;">
+            <select id="yValue2">
+                <option value="Control">Control</option>
+                <option value="Region">Region</option>
+                <option value="Locale">Locale</option>
+            </select>
+            <label>and</label>
+            <select id="xValue2">
+                <option value="Admission Rate">Admission Rate</option>
+                <option value="ACT Median">ACT Median</option>
+                <option value="SAT Average">SAT Average</option>
+                <option value="Undergrad Population">Undergrad Population</option>
+            </select>
+        </div>
     </div>
+    <br></br>
+    <button type="button" name="compare" onclick="compareAttributes()">Compare</button>
     <div id="graph"></div>
 </body>
 </html>
