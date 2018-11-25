@@ -1,3 +1,5 @@
+window.onload = compareDemographics;
+
 function compareAttributes() {
     var graph = document.getElementById('graph');
     while (graph.firstChild) {
@@ -186,5 +188,115 @@ function plotGraphs(x1, y1, x2, y2) {
         //     .attr('height', function(d) {
         //         return yScale1.rangeBand();
         //     });
+      
     })
+}
+
+function compareDemographics() {
+  var size = {
+      width: window.innerWidth || document.body.clientWidth,
+      height: window.innerHeight || document.body.clientHeight
+    }
+  var margin = {top: 20, right: 20, bottom: 70, left: 80},
+    width = (.49 * size.width) - margin.left - margin.right,
+    height = 600 - margin.top - margin.bottom,
+    radius = 200;
+  var pieChart = document.getElementById('pieChart');
+  var select = document.getElementById('selectCollege');
+
+  d3.csv("colleges.csv", function(data) {
+    data.white = data['% White'];
+    data.black = data['% Black'];
+    data.hispanic = data['% Hispanic'];
+    data.asian = data['% Asian'];
+    data.americanIndian = data['% American Indian'];
+    data.pacificIslander = data['% Pacific Islander'];
+    data.biracial = data['% Biracial'];
+    return data;
+  }, function(error, data) {
+
+    if (error) {
+      throw error;
+    }
+
+    // var datas = data;
+    console.log(data);
+    // console.log(datas['Name']);
+
+    var pieData1 = d3.nest()
+                      .key(function(d) { return d.Name; })
+                      .rollup(function(v) { return {
+                        //white : data.white,
+                        white : d3.sum(v, function(d) { return d.white; }),
+                        black : d3.sum(v, function(d) { return d.black; }),
+                        hispanic : d3.sum(v, function(d) { return d.hispanic; }),
+                        asian : d3.sum(v, function(d) { return d.asian; }),
+                        americanIndian : d3.sum(v, function(d) { return d.americanIndian; }),
+                        pacificIslander : d3.sum(v, function(d) { return d.pacificIslander; }),
+                        biracial : d3.sum(v, function(d) { return d.biracial; })
+                        }
+                      })
+                      .entries(data);
+
+    //console.log(pieData1);
+    var colleges = [];
+    for (i = 0; i < pieData1.length; i++) {
+      var d = pieData1[i];
+      colleges.push(d.key);
+    }
+    //console.log(colleges);
+
+    var dropdown = d3.select(select)
+                      .append('p')
+                      .append('select')
+                        .attr('id', 'selection')
+
+    //identifying college by index
+    for (i=0; i < pieData1.length; i++) {
+      //console.log(pieData1[i]);
+      dropdown.append('option')
+              .attr('value', pieData1[i].values.Name)
+              .text(pieData1[i].key)
+    }
+
+    dropdown.on('change', function() {
+      selectedCollege = $("#selection").val();
+
+    })
+    console.log($("#selection").val());
+    var selectedCollegeData = [];
+
+    d3.select(select)
+      .append('p')
+      .append('button')
+      .text('View Demographics')
+      .on('click', function() {
+        //selectedCollege = $("#selection").val());
+      });
+
+
+    var pieChart1 = d3.select(pieChart)
+                      .append('svg')
+                        .attr('width', width + margin.left + margin.right)
+                        .attr('height', height + margin.top + margin.bottom)
+                      .append('g')
+                        .attr('transform', 'translate(' + radius + ', ' + radius + ')');
+
+    //create <path> elements using arc data
+    var arc = d3.svg.arc().outerRadius(radius);
+
+    //create arc data given list of values
+    var pie = d3.layout.pie()
+                .value(function(d) {
+                  return d.value;
+                })
+
+    // var arcs = pieChart1.selectAll('g.slice')
+    //                     .data(pie)
+    //                     .enter()
+    //                     .append('g')
+    //                       .attr('class', 'slice');
+
+  });
+
 }
