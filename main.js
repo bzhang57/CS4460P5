@@ -198,20 +198,27 @@ function compareDemographics() {
       height: window.innerHeight || document.body.clientHeight
     }
   var margin = {top: 20, right: 20, bottom: 70, left: 80},
-    width = (.49 * size.width) - margin.left - margin.right,
-    height = 600 - margin.top - margin.bottom,
-    radius = 200;
+    // width = (.49 * size.width) - margin.left - margin.right,
+    //width = (.7 * size.width) - margin.left - margin.right,
+    width1 = 450 - margin.left - margin.right,
+    width = 600 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom,
+    radius = 180,
+    color = d3.scale.category20(),
+    legendRectSize = 18, // defines the size of the colored squares in legend
+    legendSpacing = 4; // defines spacing between squares;
+
   var pieChart = document.getElementById('pieChart');
   var select = document.getElementById('selectCollege');
 
   d3.csv("colleges.csv", function(data) {
-    data.white = data['% White'];
-    data.black = data['% Black'];
-    data.hispanic = data['% Hispanic'];
-    data.asian = data['% Asian'];
-    data.americanIndian = data['% American Indian'];
-    data.pacificIslander = data['% Pacific Islander'];
-    data.biracial = data['% Biracial'];
+    data.demo = [{'race' : '% White', 'value' : +data['% White']}, 
+                {'race' : '% Black', 'value' : +data['% Black']},
+                {'race' : '% Hispanic', 'value' : +data['% Hispanic']},
+                {'race' : '% Asian', 'value' : +data['% Asian']},
+                {'race' : '% American Indian', 'value' : +data['% American Indian']},
+                {'race' : '% Pacific Islander', 'value' : +data['% Pacific Islander']},
+                {'race' : '% Biracial', 'value' : +data['% Biracial']}];
     return data;
   }, function(error, data) {
 
@@ -219,83 +226,205 @@ function compareDemographics() {
       throw error;
     }
 
-    // var datas = data;
-    console.log(data);
-    // console.log(datas['Name']);
-
     var pieData1 = d3.nest()
                       .key(function(d) { return d.Name; })
-                      .rollup(function(v) { return {
-                        //white : data.white,
-                        white : d3.sum(v, function(d) { return d.white; }),
-                        black : d3.sum(v, function(d) { return d.black; }),
-                        hispanic : d3.sum(v, function(d) { return d.hispanic; }),
-                        asian : d3.sum(v, function(d) { return d.asian; }),
-                        americanIndian : d3.sum(v, function(d) { return d.americanIndian; }),
-                        pacificIslander : d3.sum(v, function(d) { return d.pacificIslander; }),
-                        biracial : d3.sum(v, function(d) { return d.biracial; })
-                        }
-                      })
                       .entries(data);
 
-    //console.log(pieData1);
     var colleges = [];
     for (i = 0; i < pieData1.length; i++) {
       var d = pieData1[i];
       colleges.push(d.key);
     }
-    //console.log(colleges);
 
-    var dropdown = d3.select(select)
+    var dropdown1 = d3.select(select)
                       .append('p')
+                      .append('text')
+                        .text('College 1: ')
                       .append('select')
-                        .attr('id', 'selection')
+                        .attr('id', 'selection1')
 
-    //identifying college by index
+    var dropdown2 = d3.select(select)
+                      .append('p')
+                      .append('text')
+                        .text('College 2: ')
+                      .append('select')
+                        .attr('id', 'selection2')
+
     for (i=0; i < pieData1.length; i++) {
-      //console.log(pieData1[i]);
-      dropdown.append('option')
+      dropdown1.append('option')
+              .attr('value', pieData1[i].values.Name)
+              .text(pieData1[i].key)
+      dropdown2.append('option')
               .attr('value', pieData1[i].values.Name)
               .text(pieData1[i].key)
     }
-
-    dropdown.on('change', function() {
-      selectedCollege = $("#selection").val();
-
-    })
-    console.log($("#selection").val());
-    var selectedCollegeData = [];
 
     d3.select(select)
       .append('p')
       .append('button')
       .text('View Demographics')
       .on('click', function() {
-        //selectedCollege = $("#selection").val());
-      });
+        d3.selectAll('#pieChart svg').remove();
+        var selectedCollege1 = $("#selection1").val();
+        var selectedCollege2 = $("#selection2").val();
+        console.log(selectedCollege1)
+        console.log(selectedCollege2)
+        for (i = 0; i < pieData1.length; i++) {
+          if (pieData1[i].key == selectedCollege1) {
+            console.log("found college: ", pieData1[i].key)
+            var d1 = pieData1[i];
+          }
+          if (pieData1[i].key == selectedCollege2) {
+            console.log("found college: ", pieData1[i].key)
+            var d2 = pieData1[i];
+          }
+        }
 
-
-    var pieChart1 = d3.select(pieChart)
+        console.log(selectedCollege1)
+        var pieChart1 = d3.select(pieChart)
                       .append('svg')
+                      .data([d1.values[0]['demo']])
+                        .attr('width', width1 + margin.left + margin.right)
+                        .attr('height', height + margin.top + margin.bottom)
+                        .attr('id', 'pieChart1')
+                      .append('g')
+                        .attr('transform', 'translate(' + radius + ', ' + radius + ')')
+
+        var pieChart2 = d3.select(pieChart)
+                      .append('svg')
+                      .data([d2.values[0]['demo']])
                         .attr('width', width + margin.left + margin.right)
                         .attr('height', height + margin.top + margin.bottom)
+                        .attr('id', 'pieChart2')
                       .append('g')
                         .attr('transform', 'translate(' + radius + ', ' + radius + ')');
+                      
+        d3.select('#pieChart1')
+                    .append('text')
+                    .attr('x', 100)
+                    .attr('y', 400)
+                    .text(selectedCollege1);
 
-    //create <path> elements using arc data
-    var arc = d3.svg.arc().outerRadius(radius);
+        d3.select('#pieChart2')
+                    .append('text')
+                    .attr('x', 100)
+                    .attr('y', 400)
+                    .text(selectedCollege2);
 
-    //create arc data given list of values
-    var pie = d3.layout.pie()
-                .value(function(d) {
-                  return d.value;
-                })
+        //create <path> elements using arc data
+        var arc = d3.svg.arc()
+                  .outerRadius(radius);
 
-    // var arcs = pieChart1.selectAll('g.slice')
-    //                     .data(pie)
-    //                     .enter()
-    //                     .append('g')
-    //                       .attr('class', 'slice');
+        //create arc data given list of values
+        var pie1 = d3.layout.pie()
+                    .value(function(d1) {
+                      return d1.value;
+                    })
+
+        var pie2 = d3.layout.pie()
+                    .value(function(d2) {
+                      return d2.value;
+                    })
+
+        //var arcs = pie(pieData1);
+
+
+        var arcs1 = pieChart1.selectAll('g.slice')
+                            .data(pie1)
+                            .enter()
+                              .append('g')
+                                .attr('class', 'slice');
+
+        arcs1.append('path')
+              .attr('fill', function(d1, i) { 
+                //console.log(color(d.data.race))
+                return color(d1.data.race); 
+              })
+              .attr('d', arc);
+
+        var arcs2 = pieChart2.selectAll('g.slice')
+                            .data(pie2)
+                            .enter()
+                              .append('g')
+                                .attr('class', 'slice');
+
+        arcs2.append('path')
+              .attr('fill', function(d2, i) { 
+                //console.log(color(d.data.race))
+                return color(d2.data.race); 
+              })
+              .attr('d', arc);
+
+        //tooltip
+        var tooltip = d3.select(pieChart)
+                        .append('div')
+                        .attr('class', 'pie_tooltip');
+
+            tooltip.append('div')
+                    .attr('class', 'race');
+
+            tooltip.append('div')
+                    .attr('class', 'value');
+
+        arcs1.on('mouseover', function(d1) {
+          var percent = parseFloat(100 * d1.value).toFixed(2);
+          tooltip.select('.race').html(d1.data.race); // set current race           
+          tooltip.select('.value').html(percent + '%'); // set current count d.data.count                    
+          tooltip.style('display', 'block');
+        });
+
+        arcs2.on('mouseover', function(d2) {
+          var percent = parseFloat(100 * d2.value).toFixed(2);
+          tooltip.select('.race').html(d2.data.race); // set current race           
+          tooltip.select('.value').html(percent + '%'); // set current count d.data.count                    
+          tooltip.style('display', 'block');
+        });
+
+        arcs1.on('mouseout', function() { // when mouse leaves div                        
+          tooltip.style('display', 'none'); // hide tooltip for that element
+        });
+
+        arcs2.on('mouseout', function() { // when mouse leaves div                        
+          tooltip.style('display', 'none'); // hide tooltip for that element
+        });
+
+        arcs1.on('mousemove', function(d) { // when mouse moves                  
+          tooltip.style('top', (d3.event.layerY + 10) + 'px') // always 10px below the cursor
+                 .style('left', (d3.event.layerX + 10) + 'px'); // always 10px to the right of the mouse
+        });
+
+        arcs2.on('mousemove', function(d) { // when mouse moves                  
+          tooltip.style('top', (d3.event.layerY + 10) + 'px') // always 10px below the cursor
+                 .style('left', (d3.event.layerX + 10) + 'px'); // always 10px to the right of the mouse
+        });
+
+        var legend2 = pieChart2.selectAll('.legend')
+                        .data(color.domain())
+                        .enter()
+                        .append('g')
+                        .attr('class', 'legend')
+                        .attr('transform', function(d2, i) {
+                          var legendHeight = legendRectSize + legendSpacing; // height of element is the height of the colored square plus the spacin
+                          var offset =  legendHeight * color.domain().length / 2; // vertical offset of the entire legend = height of a single element & half the total number of elements
+                          var horz = 14 * legendRectSize; // the legend is shifted to the left to make room for the text
+                          var vert = i * legendHeight - offset; // the top of the element is hifted up or down from the center using the offset defiend earlier and the index of the current element 'i'               
+                          return 'translate(' + horz + ',' + vert + ')'; //return translation 
+                        });
+
+        // adding colored squares to legend
+        legend2.append('rect')                                 
+          .attr('width', legendRectSize)                       
+          .attr('height', legendRectSize)                     
+          .style('fill', color)
+          .style('stroke', color);
+
+        // adding text to legend
+        legend2.append('text')                                    
+          .attr('x', legendRectSize + legendSpacing)
+          .attr('y', legendRectSize - legendSpacing)
+          .text(function(d2) { return d2; }); // return label
+
+      });
 
   });
 
