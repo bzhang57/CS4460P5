@@ -6,38 +6,49 @@
     <script src="http://d3js.org/d3.v3.min.js"></script>
     <script src="main.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <h1>College Admission and Demographic Statistics Visualization</h1>
-    <label>Show relationship between:</label>
+    <h3><u>Comparison of All U.S College Data</u></h3>
+    <label>Independent variable:</label>
+    <select id="yValue1">
+        <option value="Control">Control</option>
+        <option value="Region">Region</option>
+        <option value="Locale">Locale</option>
+        <option value="Highest Degree">Highest Degree</option>
+    </select>
     <div>
         <div style="float: left; width: 50%;">
-        <select id="yValue1">
-            <option value="Control">Control</option>
-            <option value="Region">Region</option>
-            <option value="Locale">Locale</option>
-        </select>
-        <label>and</label>
+        <label>Graph 1 attribute: </label>
         <select id="xValue1">
             <option value="Admission Rate">Admission Rate</option>
             <option value="ACT Median">ACT Median</option>
             <option value="SAT Average">SAT Average</option>
             <option value="Undergrad Population">Undergrad Population</option>
+            <option value="Average Cost">Average Cost</option>
+            <option value="Expenditure Per Student">Expenditure Per Student</option>
+            <option value="Average Faculty Salary">Average Faculty Salary</option>
+            <option value="% Full-time Faculty">% Full-time Faculty</option>
+            <option value="Retention Rate (First Time Students)">Retention Rate</option>
+            <option value="Poverty Rate">Poverty Rate</option>
         </select>
         </div>
         <div style="float: right; width: 50%;">
-            <select id="yValue2">
-                <option value="Control">Control</option>
-                <option value="Region">Region</option>
-                <option value="Locale">Locale</option>
-            </select>
-            <label>and</label>
+
+            <label>Graph 2 attribute: </label>
             <select id="xValue2">
                 <option value="Admission Rate">Admission Rate</option>
                 <option value="ACT Median">ACT Median</option>
                 <option value="SAT Average">SAT Average</option>
                 <option value="Undergrad Population">Undergrad Population</option>
+                <option value="Average Cost">Average Cost</option>
+                <option value="Expenditure Per Student">Expenditure Per Student</option>
+                <option value="Average Faculty Salary">Average Faculty Salary</option>
+                <option value="% Full-time Faculty">% Full-time Faculty</option>
+                <option value="Retention Rate (First Time Students)">Retention Rate</option>
+                <option value="Poverty Rate">Poverty Rate</option>
             </select>
         </div>
     </div>

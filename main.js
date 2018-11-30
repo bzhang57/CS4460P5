@@ -8,8 +8,8 @@ function compareAttributes() {
     var x1 = document.getElementById("xValue1").value;
     var y1 = document.getElementById("yValue1").value;
     var x2 = document.getElementById("xValue2").value;
-    var y2 = document.getElementById("yValue2").value;
-    plotGraphs(x1, y1, x2, y2);
+    //var y2 = document.getElementById("yValue2").value;
+    plotGraphs(x1, y1, x2, y1);
 }
 
 function plotGraphs(x1, y1, x2, y2) {
@@ -20,10 +20,11 @@ function plotGraphs(x1, y1, x2, y2) {
       width: window.innerWidth || document.body.clientWidth,
       height: window.innerHeight || document.body.clientHeight
     }
-    var margin = {top: 20, right: 20, bottom: 70, left: 80},
+    var margin = {top: 20, right: 20, bottom: 70, left: 90},
     width = (.49 * size.width) - margin.left - margin.right,
     height = 600 - margin.top - margin.bottom;
     var graph = document.getElementById('graph');
+
 
     // var g = barChart.append("g")
     //            .attr("transform", "translate(" + 100 + "," + 100 + ")");
@@ -45,6 +46,9 @@ function plotGraphs(x1, y1, x2, y2) {
             dict["mean"] = mean;
             arr1.push(dict);
         }
+
+
+        var colorScale = d3.scale.category20();
 
         var sortedKeys1 = arr1.slice(0);
         sortedKeys1.sort(function(a, b) {
@@ -69,13 +73,61 @@ function plotGraphs(x1, y1, x2, y2) {
             return b.mean - a.mean;
         });
 
+        var tip = d3.tip()
+          .attr('class', 'd3-tip')
+          .offset([-10, 0])
+          .html(function(d) {
+              var value = null;
+              for (var i = 0; i < arr1.length; i++) {
+                  var attributeDict = arr1[i];
+                  if (attributeDict.key == d.key) {
+                      value = attributeDict.mean;
+                      break;
+                  }
+              }
+              var numColleges = 0;
+              for (var i = 0; i < dataByAttr1.length; i++) {
+                  var dict = dataByAttr1[i];
+                  if (dict.key == d.key) {
+                      numColleges = dict.values.length;
+                      break;
+                  }
+              }
+            return "<strong>" + x1 + ":</strong> <span style='color:red'>" + Math.round(value * 1000) / 1000
+            + "</span><br></br><strong>Total Colleges: <span style='color:red'>" + numColleges + "</span>";
+          })
 
+        var tip2 = d3.tip()
+            .attr('class', 'd3-tip')
+            .offset([-10, 0])
+            .html(function(d) {
+            var value = null;
+            for (var i = 0; i < arr2.length; i++) {
+                var attributeDict = arr2[i];
+                if (attributeDict.key == d.key) {
+                    value = attributeDict.mean;
+                    break;
+                }
+            }
+            var numColleges = 0;
+            for (var i = 0; i < dataByAttr2.length; i++) {
+                var dict = dataByAttr2[i];
+                if (dict.key == d.key) {
+                    numColleges = dict.values.length;
+                    break;
+                }
+            }
+          return "<strong>" + x2 + ":</strong> <span style='color:red'>" + Math.round(value * 1000) / 1000
+          + "</span><br></br><strong>Total Colleges: <span style='color:red'>" + numColleges + "</span>";
+        })
         var xScale1 = d3.scale.linear()
             .domain([0, d3.max(data, function(d) { return parseFloat(d[x1]); })])
             .range([0, width]);
         var yScale1 = d3.scale.ordinal()
             .domain(sortedKeys1.map(function(d) { return d.key; }))
             .rangeRoundBands([0, height], 0.3);
+        colorScale.domain(sortedKeys1.map(function (d){ return d.key; }));
+
         var xAxis1 = d3.svg.axis().scale(xScale1).orient('bottom');
         var yAxis1 = d3.svg.axis().scale(yScale1).orient('left');
         // g.append("g")
@@ -86,7 +138,8 @@ function plotGraphs(x1, y1, x2, y2) {
             .attr('width', width + margin.left + margin.right)
             .attr('height', height + margin.top + margin.bottom)
             .append("g")
-               .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+               .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+            .call(tip);
         barChart1.append("g")
             .attr("class", "x axis")
             .attr("transform", "translate(0," + (height) + ")")
@@ -102,6 +155,14 @@ function plotGraphs(x1, y1, x2, y2) {
               .attr("dy", ".71em")
               .style("text-anchor", "end")
               .text(y1);
+        barChart1.append("text")
+            .attr("x", (width / 2))
+            .attr("y", 0 - (margin.top / 2) + 3)
+            .attr("text-anchor", "middle")
+            .style("font-size", "16px")
+            .style("text-decoration", "underline")
+            .text(y1 + " vs. " + x1);
+
         // pie chart on right side
         var xScale2 = d3.scale.linear()
             .domain([0, d3.max(data, function(d) { return parseFloat(d[x2]); })])
@@ -119,7 +180,8 @@ function plotGraphs(x1, y1, x2, y2) {
             .attr('width', width + margin.left + margin.right)
             .attr('height', height + margin.top + margin.bottom)
             .append("g")
-               .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+               .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+               .call(tip2);
         barChart2.append("g")
             .attr("class", "x axis")
             .attr("transform", "translate(0," + (height) + ")")
@@ -143,6 +205,7 @@ function plotGraphs(x1, y1, x2, y2) {
                   .data(dataByAttr1)
                   .enter()
                   .append("g")
+                  .attr("fill", function (d){ return colorScale(d.key); });
 
         bars1.append("rect")
             .attr("class", "bar")
@@ -153,7 +216,9 @@ function plotGraphs(x1, y1, x2, y2) {
                .attr("x", 0)
                .attr("width", function(d) {
                    return xScale1(d3.mean(d.values, function(d) {return parseFloat(d[x1])}));
-               });
+               })
+               .on('mouseover', tip.show)
+               .on('mouseout', tip.hide);
        var dataByAttr2 = d3.nest()
                            .key(function(d) { return d[y2]; })
                            .entries(data);
@@ -161,7 +226,7 @@ function plotGraphs(x1, y1, x2, y2) {
                    .data(dataByAttr2)
                    .enter()
                    .append("g")
-
+                   .attr("fill", function (d){ return colorScale(d.key); });
          bars2.append("rect")
              .attr("class", "bar")
                 .attr("y", function(d) {
@@ -171,7 +236,16 @@ function plotGraphs(x1, y1, x2, y2) {
                 .attr("x", 0)
                 .attr("width", function(d) {
                     return xScale2(d3.mean(d.values, function(d) {return parseFloat(d[x2])}));
-                });
+                })
+                .on('mouseover', tip2.show)
+                .on('mouseout', tip2.hide);
+        barChart2.append("text")
+            .attr("x", (width / 2))
+            .attr("y", 0 - (margin.top / 2) + 3)
+            .attr("text-anchor", "middle")
+            .style("font-size", "16px")
+            .style("text-decoration", "underline")
+            .text(y2 + " vs. " + x2);
 // barChart1.selectAll('.bar')
         //     .data(data)
         //     .enter()
@@ -188,7 +262,7 @@ function plotGraphs(x1, y1, x2, y2) {
         //     .attr('height', function(d) {
         //         return yScale1.rangeBand();
         //     });
-      
+
     })
 }
 
@@ -212,7 +286,7 @@ function compareDemographics() {
   var select = document.getElementById('selectCollege');
 
   d3.csv("colleges.csv", function(data) {
-    data.demo = [{'race' : '% White', 'value' : +data['% White']}, 
+    data.demo = [{'race' : '% White', 'value' : +data['% White']},
                 {'race' : '% Black', 'value' : +data['% Black']},
                 {'race' : '% Hispanic', 'value' : +data['% Hispanic']},
                 {'race' : '% Asian', 'value' : +data['% Asian']},
@@ -298,7 +372,7 @@ function compareDemographics() {
                         .attr('id', 'pieChart2')
                       .append('g')
                         .attr('transform', 'translate(' + radius + ', ' + radius + ')');
-                      
+
         d3.select('#pieChart1')
                     .append('text')
                     .attr('x', 100)
@@ -336,9 +410,9 @@ function compareDemographics() {
                                 .attr('class', 'slice');
 
         arcs1.append('path')
-              .attr('fill', function(d1, i) { 
+              .attr('fill', function(d1, i) {
                 //console.log(color(d.data.race))
-                return color(d1.data.race); 
+                return color(d1.data.race);
               })
               .attr('d', arc);
 
@@ -349,9 +423,9 @@ function compareDemographics() {
                                 .attr('class', 'slice');
 
         arcs2.append('path')
-              .attr('fill', function(d2, i) { 
+              .attr('fill', function(d2, i) {
                 //console.log(color(d.data.race))
-                return color(d2.data.race); 
+                return color(d2.data.race);
               })
               .attr('d', arc);
 
@@ -368,32 +442,32 @@ function compareDemographics() {
 
         arcs1.on('mouseover', function(d1) {
           var percent = parseFloat(100 * d1.value).toFixed(2);
-          tooltip.select('.race').html(d1.data.race); // set current race           
-          tooltip.select('.value').html(percent + '%'); // set current count d.data.count                    
+          tooltip.select('.race').html(d1.data.race); // set current race
+          tooltip.select('.value').html(percent + '%'); // set current count d.data.count
           tooltip.style('display', 'block');
         });
 
         arcs2.on('mouseover', function(d2) {
           var percent = parseFloat(100 * d2.value).toFixed(2);
-          tooltip.select('.race').html(d2.data.race); // set current race           
-          tooltip.select('.value').html(percent + '%'); // set current count d.data.count                    
+          tooltip.select('.race').html(d2.data.race); // set current race
+          tooltip.select('.value').html(percent + '%'); // set current count d.data.count
           tooltip.style('display', 'block');
         });
 
-        arcs1.on('mouseout', function() { // when mouse leaves div                        
+        arcs1.on('mouseout', function() { // when mouse leaves div
           tooltip.style('display', 'none'); // hide tooltip for that element
         });
 
-        arcs2.on('mouseout', function() { // when mouse leaves div                        
+        arcs2.on('mouseout', function() { // when mouse leaves div
           tooltip.style('display', 'none'); // hide tooltip for that element
         });
 
-        arcs1.on('mousemove', function(d) { // when mouse moves                  
+        arcs1.on('mousemove', function(d) { // when mouse moves
           tooltip.style('top', (d3.event.layerY + 10) + 'px') // always 10px below the cursor
                  .style('left', (d3.event.layerX + 10) + 'px'); // always 10px to the right of the mouse
         });
 
-        arcs2.on('mousemove', function(d) { // when mouse moves                  
+        arcs2.on('mousemove', function(d) { // when mouse moves
           tooltip.style('top', (d3.event.layerY + 10) + 'px') // always 10px below the cursor
                  .style('left', (d3.event.layerX + 10) + 'px'); // always 10px to the right of the mouse
         });
@@ -407,19 +481,19 @@ function compareDemographics() {
                           var legendHeight = legendRectSize + legendSpacing; // height of element is the height of the colored square plus the spacin
                           var offset =  legendHeight * color.domain().length / 2; // vertical offset of the entire legend = height of a single element & half the total number of elements
                           var horz = 14 * legendRectSize; // the legend is shifted to the left to make room for the text
-                          var vert = i * legendHeight - offset; // the top of the element is hifted up or down from the center using the offset defiend earlier and the index of the current element 'i'               
-                          return 'translate(' + horz + ',' + vert + ')'; //return translation 
+                          var vert = i * legendHeight - offset; // the top of the element is hifted up or down from the center using the offset defiend earlier and the index of the current element 'i'
+                          return 'translate(' + horz + ',' + vert + ')'; //return translation
                         });
 
         // adding colored squares to legend
-        legend2.append('rect')                                 
-          .attr('width', legendRectSize)                       
-          .attr('height', legendRectSize)                     
+        legend2.append('rect')
+          .attr('width', legendRectSize)
+          .attr('height', legendRectSize)
           .style('fill', color)
           .style('stroke', color);
 
         // adding text to legend
-        legend2.append('text')                                    
+        legend2.append('text')
           .attr('x', legendRectSize + legendSpacing)
           .attr('y', legendRectSize - legendSpacing)
           .text(function(d2) { return d2; }); // return label
