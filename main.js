@@ -276,7 +276,7 @@ function compareDemographics() {
     //width = (.7 * size.width) - margin.left - margin.right,
     width1 = 450 - margin.left - margin.right,
     width = 600 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom,
+    height = 600 - margin.top - margin.bottom,
     radius = 180,
     color = d3.scale.category20(),
     legendRectSize = 18, // defines the size of the colored squares in legend
@@ -354,6 +354,21 @@ function compareDemographics() {
           }
         }
 
+        var college1_AdminRate = parseFloat(100 * d1.values[0]['Admission Rate']).toFixed(2);
+        var college1_act = d1.values[0]['ACT Median'];
+        var college1_sat = d1.values[0]['SAT Average'];
+        var college1_pop = d1.values[0]['Undergrad Population'];
+        var college1_cost = d1.values[0]['Average Cost'];
+
+        var college2_AdminRate = parseFloat(100 * d2.values[0]['Admission Rate']).toFixed(2);
+        var college2_act = d2.values[0]['ACT Median'];
+        var college2_sat = d2.values[0]['SAT Average'];
+        var college2_pop = d2.values[0]['Undergrad Population'];
+        var college2_cost = d2.values[0]['Average Cost'];
+        var college2_data = ['Admission Rate: ' + college2_AdminRate + '%', 'ACT Median: ' + college2_act,
+                            'SAT Average: ' + college2_sat, 'Undergrad Population: ' + college2_pop,
+                            'Average Cost: ' + '$' + college2_cost];
+
         console.log(selectedCollege1)
         var pieChart1 = d3.select(pieChart)
                       .append('svg')
@@ -361,7 +376,7 @@ function compareDemographics() {
                         .attr('width', width1 + margin.left + margin.right)
                         .attr('height', height + margin.top + margin.bottom)
                         .attr('id', 'pieChart1')
-                      .append('g')
+                        .append('g')
                         .attr('transform', 'translate(' + radius + ', ' + radius + ')')
 
         var pieChart2 = d3.select(pieChart)
@@ -377,13 +392,78 @@ function compareDemographics() {
                     .append('text')
                     .attr('x', 100)
                     .attr('y', 400)
-                    .text(selectedCollege1);
+                    .text(selectedCollege1)
+                    .style('font-weight', 'bold')
+
+
+        d3.select('#pieChart1')
+                    .append('text')
+                    .attr('x', 100)
+                    .attr('y', 430)
+                    .text('Admission Rate: ' + college1_AdminRate + '%')
+
+        d3.select('#pieChart1')
+                    .append('text')
+                    .attr('x', 100)
+                    .attr('y', 455)
+                    .text('ACT Median: ' + college1_act)
+
+        d3.select('#pieChart1')
+                    .append('text')
+                    .attr('x', 100)
+                    .attr('y', 480)
+                    .text('SAT Average: ' + college1_sat)
+
+        d3.select('#pieChart1')
+                    .append('text')
+                    .attr('x', 100)
+                    .attr('y', 505)
+                    .text('Undergrad Population: ' + college1_pop)
+
+        d3.select('#pieChart1')
+                    .append('text')
+                    .attr('x', 100)
+                    .attr('y', 530)
+                    .text('Average Cost: ' + '$' + college1_cost)
 
         d3.select('#pieChart2')
                     .append('text')
                     .attr('x', 100)
                     .attr('y', 400)
-                    .text(selectedCollege2);
+                    .text(selectedCollege2)
+                    .style('font-weight', 'bold')
+
+        d3.select('#pieChart2')
+                    .append('text')
+                    .attr('x', 100)
+                    .attr('y', 430)
+                    .text('Admission Rate: ' + college2_AdminRate + '%')
+
+        d3.select('#pieChart2')
+                    .append('text')
+                    .attr('x', 100)
+                    .attr('y', 455)
+                    .text('ACT Median: ' + college2_act)
+
+        d3.select('#pieChart2')
+                    .append('text')
+                    .attr('x', 100)
+                    .attr('y', 480)
+                    .text('SAT Average: ' + college2_sat)
+
+        d3.select('#pieChart2')
+                    .append('text')
+                    .attr('x', 100)
+                    .attr('y', 505)
+                    .text('Undergrad Population: ' + college2_pop)
+
+        d3.select('#pieChart2')
+                    .append('text')
+                    .attr('x', 100)
+                    .attr('y', 530)
+                    .text('Average Cost: ' + '$' + college2_cost)
+
+
 
         //create <path> elements using arc data
         var arc = d3.svg.arc()
